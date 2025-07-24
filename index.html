@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urhobo-English Dictionary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #02a95c 0%, #51701f 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #02a95c, #51701f);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+
+        .header b {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 40px 30px;
+            background: #f8f9fa;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 25px;
+            font-size: 1.2rem;
+            border: 3px solid #02a95c;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(2, 169, 92, 0.1);
+        }
+
+        .search-input:focus {
+            border-color: #8c6c43;
+            box-shadow: 0 10px 25px rgba(140, 108, 67, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background: #f0faff;
+        }
+
+        .suggestion-word {
+            font-weight: bold;
+            color: #02a95c;
+        }
+
+        .suggestion-translation {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #02a95c, #51701f);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 5px 15px rgba(2, 169, 92, 0.3);
+        }
+
+        .results-section {
+            padding: 30px;
+            min-height: 300px;
+        }
+
+        .dictionary-entry {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .word-header {
+            border-bottom: 3px solid #02a95c;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .urhobo-word {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #02a95c;
+            margin-bottom: 10px;
+        }
+
+        .pos {
+            background: #8c6c43;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .translation {
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .audio-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .audio-btn {
+            background: linear-gradient(135deg, #51701f, #02a95c);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .audio-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(81, 112, 31, 0.3);
+        }
+
+        .audio-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .examples-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .example {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #02a95c;
+        }
+
+        .example-urhobo {
+            font-style: italic;
+            color: #02a95c;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .example-english {
+            color: #666;
+        }
+
+        .illustration {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .illustration img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+
+        .no-results h3 {
+            color: #8c6c43;
+            margin-bottom: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .donate-btn, .feedback-btn, .book-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .donate-btn {
+            background: linear-gradient(135deg, #02a95c, #51701f);
+            color: white;
+        }
+
+        .book-btn {
+            background: linear-gradient(135deg, #02a95c, #13c5ad);
+            color: white;
+        }
+
+        .feedback-btn {
+            background: linear-gradient(135deg, #8c6c43, #51701f);
+            color: white;
+        }
+
+        .donate-btn:hover, .feedback-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .footer h4 {
+            color: #02a95c;
+            margin-bottom: 10px;
+        }
+
+        .contact-info {
+            margin: 15px 0;
+        }
+
+        .contact-info a {
+            color: #02a95c;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e9ecef;
+            border-top: 4px solid #02a95c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .urhobo-word {
+                font-size: 1.8rem;
+            }
+            
+            .audio-controls {
+                justify-content: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Urhobo-English Dictionary</h1>
+            <p>Preserving and Sharing Urhobo Heritage</p>
+            <b><i>Please note that this dictionary is still under development.</i></b>
+        </div>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search for an Urhobo or English word..." id="searchInput">
+                <div class="suggestions" id="suggestions"></div>
+                <button class="search-button" onclick="searchWord()">🔍 Search</button>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="no-results">
+                <h3>Welcome to Urhobo-English Dictionary</h3>
+                <p>Enter an Urhobo or English word in the search box above to find its meaning, pronunciation, and examples.</p>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="https://flutterwave.com/pay/lm3iu4hazm3p" class="donate-btn" target="_blank">💝 Support This Project</a>
+            <a href="https://www.choglobal.com.ng/ca/uh" class="book-btn" target="_blank">📝Book Urhobo Language Class</a>
+            <button class="feedback-btn" onclick="openFeedback()">📝 Submit Feedback</button>
+        </div>
+
+        <div class="footer">
+            <h4>About This Dictionary</h4>
+            <p><strong>Produced by:</strong> Urhobo Heritage</p>
+            <p><strong>Lead Contributor & Editor-in-Chief:</strong> Abednego Oghenechovwiere Omashone</p>
+            <p>All materials in this dictionary are the intellectual properties of Abednego Oghenechovwiere Omashone. No part of it may be reproduced, repurposed or transmitted in any medium whatsoever without written permission.</p>
+            
+            <div class="contact-info">
+                <h4>Contact & Inquiries</h4>
+                <p>Email: <a href="mailto:urhoboheritage23@gmail.com">urhoboheritage23@gmail.com</a> | <a href="mailto:choglobalconcepts@gmail.com">choglobalconcepts@gmail.com</a></p>
+                <p>Phone/WhatsApp: <a href="tel:+2347031983620">+234 703 198 3620</a></p>
+                <p>This project came to you at no cost. Voluntary donations for sustenance and enlargement are highly appreciated.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inline dictionary data
+        let dictionaryData = [
+            {
+                "UBIOTA": "Abaka",
+                "POS": "N",
+                "UBIOTA AUDIO": "https://archive.org/download/Abaka/Abaka%20.mp3",
+                "TRANSLATION": "Grasshopper (n)",
+                "ILLUSTRATION": "https://ia601002.us.archive.org/33/items/afioto-re-oyibo-rabbit/Abaka%20-%20grasshopper.png",
+                "UDJE 1": "Abaka riẹ ẹbe rẹ enẹ mẹ na.",
+                "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abaka%20s1.aac",
+                "EXAMPLE 1": "Grashopper ate my yam's leaves.",
+                "UDJE 2": "Ya jẹ abaka na vwo; wo hwe-e.",
+                "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abaka%20s2.aac",
+                "EXAMPLE 2": "Leave the grahopper alone; do not kill it."
+            },
+            {
+                "UBIOTA": "Abamwa",
+                "POS": "n",
+                "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abamwa%20.aac",
+                "TRANSLATION": "rag, piece of cloth, torn piece of cloth",
+                "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/abamwa.jpeg",
+                "UDJE 1": "Abamwa yẹ oku phiyọ rhe etinẹ.",
+                "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abamwa%20s1.aac",
+                "EXAMPLE 1": "It was rag he/she down here.",
+                "UDJE 2": "Biko kẹ vwẹ abamwa mi vwo ririẹ imẹdjẹ na.",
+                "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abamwa%20s2.aac",
+                "EXAMPLE 2": "Please give me a piece of cloth to clean the table"
+            },
+            {
+                "UBIOTA": "abavo",
+                "POS": "a",
+                "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abavo%20.aac",
+                "TRANSLATION": "equal/fair",
+                "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/Abavo.jpeg",
+                "UDJE 1": "Ovwa ghare emu na abavo.",
+                "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abavo%20s1.aac",
+                "EXAMPLE 1": "Share the food (or thing) equally.",
+                "UDJE 2": "Abavo ọ yẹ oguẹdjọ na brẹ orhiẹ na.",
+                "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abavo.aac",
+                "EXAMPLE 2": "The judge gave a fair judgement."
+            },
+            {
+                "UBIOTA": "Abe",
+                "POS": "N",
+                "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abe.aac",
+                "TRANSLATION": "A species of water yam with red colored leaves and tuber",
+                "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/abe.jpeg",
+                "UDJE 1": "Abe na nabọ vwerhe.",
+                "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abe%20s1.aac",
+                "EXAMPLE 1": "The abe tastes well.",
+                "UDJE 2": "Me kẹ abe phi yẹ udju mẹ.",
+                "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abe%20s2.aac",
+                "EXAMPLE 2": "I planted abe in my farm."
+            },
+            {
+                "UBIOTA": "Abé",
+                "POS": "N",
+                "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abe%201%20.aac",
+                "TRANSLATION": "Guilty verdict",
+                "ILLUSTRATION": "https://ia801002.us.archive.org/33/items/afioto-re-oyibo-rabbit/abe1.jpeg",
+                "UDJE 1": "Nighere, e brẹ orhiẹ hwe we; wọ riẹ abe՛.",
+                "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abe%201%20s1.aac",
+                "EXAMPLE 1": "Look, the verdict is against you; you are guilty",
+                "UDJE 2": "Me riẹ abe՛ rẹ ota nana-a.",
+                "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abe%201%20s2.aac",
+                "EXAMPLE 2": "I am not guilty in this matter."
+            },
+            {
+            "UBIOTA": "abémuó",
+            "POS": "n",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abemuo.aac",
+            "TRANSLATION": "Wrestling - The act of wrestling",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/abemuo.jpeg",
+            "UDJE 1": "E jẹ a vwẹ abémuó vwo vughẹ ohwo rẹ ọma goma.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abemuo%20s1.aac",
+            "EXAMPLE 1": "Let us use wrestling to determine the strongest person.",
+            "UDJE 2": "Avwaren kpẹ abémuó vwẹ obẹ ọgua rẹ ọkaorho.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abemuo%20s2.aac",
+            "EXAMPLE 2": "We are going for a wrestling at the chief's court."
+        },
+        {
+            "UBIOTA": "abẹrẹn",
+            "POS": "n",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/aberen.aac",
+            "TRANSLATION": "royal sword",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/aberen%20royal%20sword.jpg",
+            "UDJE 1": "Inogbozighi chẹ abẹrẹn rẹ ovie na nẹ ọgua rọye.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/aberen%20s1.aac",
+            "EXAMPLE 1": "Hooligans have stolen the king's royal sword from his palace.",
+            "UDJE 2": "Ọsẹ mẹ rode ọye ri dẹ abẹrẹn na miẹ ọneki oyibo re se Winterson.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/aberen%20s2.aac",
+            "EXAMPLE 2": "It was my grand father who bought the royal sword from a white trader called Winterson."
+        },
+        {
+            "UBIOTA": "abérha",
+            "POS": "adv",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/aberha.aac",
+            "TRANSLATION": "thrice",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/aberha.jpeg",
+            "UDJE 1": "Abérha yẹ ọkpako nyẹ ota.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/aberha%20s1.aac",
+            "EXAMPLE 1": "It is thrice an elder hears an utterance.",
+            "UDJE 2": "Aberha Otiti riẹ emu odẹye.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/aberha%20s2.aac",
+            "EXAMPLE 2": "Otiti ate thrice yesterday."
+        },
+        {
+            "UBIOTA": "abívẹ",
+            "POS": "adv",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abive%20.aac",
+            "TRANSLATION": "twice",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/abive.jpeg",
+            "UDJE 1": "Ọna ọvwọ gba abivẹ oravwọ nana phiare.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abive%20s1.aac",
+            "EXAMPLE 1": "This made twice this thing has happened.",
+            "UDJE 2": "Jẹ o ruo keri.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abive%20s2.aac",
+            "EXAMPLE 2": "Let him/her do it twice before you retalliate."
+        },
+        {
+            "UBIOTA": "Abọ",
+            "POS": "N",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abo.aac",
+            "TRANSLATION": "Wrestling",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/abo.jpeg",
+            "UDJE 1": "Mọ e mu abọ.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abo%20s1.aac",
+            "EXAMPLE 1": "Come let's wrestle.",
+            "UDJE 2": "Abọ emuo yoma mamọ.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abo%20s2.aac",
+            "EXAMPLE 2": "Wrestling is very good."
+        },
+        {
+            "UBIOTA": "Abọ",
+            "POS": "n(pl)",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abo%201.aac",
+            "TRANSLATION": "hands",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/abo%201.jpeg",
+            "UDJE 1": "Riẹ abọ wẹ kẹ vwẹ.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abo%201%20s1.aac",
+            "EXAMPLE 1": "Stretch your hands towards me.",
+            "UDJE 2": "Ra a hworhẹ abọ wẹ.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abo%201%20s2.aac",
+            "EXAMPLE 2": "Go and wash your hands."
+        },
+        {
+            "UBIOTA": "Abọ",
+            "POS": "adv",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abo%202.aac",
+            "TRANSLATION": "times/frequency",
+            "ILLUSTRATION": "",
+            "UDJE 1": "Mi se we abọ iyorin, wọ kpare kẹ vwẹ-ẹ",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abo%202%20s1.aac",
+            "EXAMPLE 1": "I called you five times, you didn't answer me.",
+            "UDJE 2": "Wo ruẹ emu nana abọ buebu re.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abo%202%20s2.aac",
+            "EXAMPLE 2": "You have done this many times."
+        },
+        {
+            "UBIOTA": "Abọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abo%203.aac",
+            "TRANSLATION": "challenge/encourage",
+            "ILLUSTRATION": "",
+            "UDJE 1": "Mi se we abọ nonẹ nu wo ru obo ri fori ọke eje.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abo%203%20s1.aac",
+            "EXAMPLE 1": "I challenge (encourage) you today to do what is right all the time.",
+            "UDJE 2": "Vwẹ ọna vwo se aye abọ.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abo%203%20s2.aac",
+            "EXAMPLE 2": "Challenge/encourage them with this."
+        },
+        {
+            "UBIOTA": "abotu",
+            "POS": "a",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/abotu%20.aac",
+            "TRANSLATION": "group effort, crowd",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/abotu.jpeg",
+            "UDJE 1": "Abotu aye vwo muo yara.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/abotu%20s1.aac",
+            "EXAMPLE 1": "They carried him/her/it away with group effort.",
+            "UDJE 2": "We biko, e jẹ a vwẹ abotu vwọ wian owian na.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/abotu%20s2.aac",
+            "EXAMPLE 2": "Please let us use group effort to do the job."
+        },
+        {
+            "UBIOTA": "Ada",
+            "POS": "n",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/ada.aac",
+            "TRANSLATION": "outing",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/ada.jpeg",
+            "UDJE 1": "Oniovo mẹ kpẹ ada.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/ada%20s1.aac",
+            "EXAMPLE 1": "My sibling went on outing.",
+            "UDJE 2": "Wo kpẹ ada nọ.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/ada%20s2.aac",
+            "EXAMPLE 2": "You go on outing too much."
+        },
+        {
+            "UBIOTA": "áda",
+            "POS": "n",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/ada%201.aac",
+            "TRANSLATION": "forked stick",
+            "ILLUSTRATION": "https://ia801002.us.archive.org/33/items/afioto-re-oyibo-rabbit/ada%201.jpeg",
+            "UDJE 1": "Nya vwẹ áda kẹ vwẹ me vwọ chẹ idjighere mẹ.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/ada%201%20s1.aac",
+            "EXAMPLE 1": "Cut me a forked stick to wedge my bicycle.",
+            "UDJE 2": "Áda wọ nya vwe kẹ vwẹ na gare-e.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/ada%201%20s2.aac",
+            "EXAMPLE 2": "The forked stick you cut for me is not strong."
+        },
+        {
+            "UBIOTA": "ádá/á dá",
+            "POS": "adv/adv ph",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/ada%202.aac",
+            "TRANSLATION": "when (as in when something is being done)",
+            "ILLUSTRATION": "",
+            "UDJE 1": "Ihwo suẹ une nana ádá vwẹ ọmọtẹ kpẹ orọvwe",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/ada%202%20s1.aac",
+            "EXAMPLE 1": "People sing this song when a girl is given out in marriage.",
+            "UDJE 2": "Ádá riẹ emu a tẹ ota-a.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/ada%202%20s2.aac",
+            "EXAMPLE 2": "One does not talk when eating."
+        },
+        {
+            "UBIOTA": "adérha",
+            "POS": "n",
+            "UBIOTA AUDIO": "https://archive.org/download/aberen-s-2/aderha%20.aac",
+            "TRANSLATION": "three-way junction",
+            "ILLUSTRATION": "https://ia801002.us.archive.org/33/items/afioto-re-oyibo-rabbit/aderha.jpeg",
+            "UDJE 1": "Ọbo na muẹ izobo kpẹ adérha.",
+            "UDJE 1 AUDIO": "https://archive.org/download/aberen-s-2/aderha%20s1.aac",
+            "EXAMPLE 1": "The native doctor took the sacrifice to a three-way junction.",
+            "UDJE 2": "Hẹrhẹ ovwẹ wo de tẹ adérha na.",
+            "UDJE 2 AUDIO": "https://archive.org/download/aberen-s-2/aderha%20s2.aac",
+            "EXAMPLE 2": "Wait on me when you get to the three-way junction."
+        },
+        {
+            "UBIOTA": "ádié",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "position/part",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "adján",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "bat",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "adjaọghẹnẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "swallow",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ádjeghwọghwọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "camphor",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "adjené",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "self acclaimed witch or wizard",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ádjọkrótẹgba",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "pants",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "adjudju",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "hand fan, fan",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "adjugẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "wheel",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "áfe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "menstruation",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "áfiédjọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "masquerade playground",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "áfiéha",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "stadium, playground",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "afiotọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "rabbit (giant rat)",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/Afioto%20-%20giant%20rat.png",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "afiotọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "rabbit",
+            "ILLUSTRATION": "https://dn721805.ca.archive.org/0/items/afioto-re-oyibo-rabbit/Afioto%20re%20oyibo%20-rabbit.png",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "afọrhe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "brain",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agada",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "crotch, area between the legs",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbá (ogba)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "oil bean seed",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbada",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "bridge",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbadarizobo",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "altar",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbagba",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "cross",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbakara (ahwarihwa)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "raffia and oil-palm beetle",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbara (aga)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "chair",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbogu",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "dagger",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbọn (iride)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "placenta",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agboro",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "echo",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbótọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "chin",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbrara",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "thunder",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agbuna",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "matches",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aghán",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "broom",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aghighọn",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "chain of coral beads worn round the neck by chiefs",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aghọghọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "joy/happiness",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ághwá",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "bush",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aghwaghwa",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "bush dog",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aghware",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "wisdom",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aghwoghwo",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "announcement",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aghwọn",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "‘hamster’ [B. there are no hamsters in Nigeria. Perhaps a bush-rat?]",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "agọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "camp, temporary settlement",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ágógó",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "gong, bell",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aguare",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "court",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "áhe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "owl-like bird",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ahọnre",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "sound of snoring",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ahwa",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "pliers",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ahworhẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "sponge",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aka1",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "Urhobo name for the Edo (Bini) people and their language",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akaba",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "specie of gong",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akaínọrọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "snake monitor",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ákán2",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "bitter kola",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akara",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "bean-cake",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akikó",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "water-snail",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akobẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "metal trap used for catching small animals such as rats",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akoríruo",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "office",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpakpasímagha",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "scorpion",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpan",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "baldness, bald head",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ákpánurhé",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "stool",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ákpátá",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "mouth-organ, organ",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ákpẹvwẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "thanksgiving",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpéyéré",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "way of life",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpérẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "elephant tusk horn",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpériọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "enjoyment",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpérusiavwrẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "padlock",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpọ1",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "world",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpọ2",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "life",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akpóno",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "very flat bead made from rubber or palm kernel shells",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akrẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "small lizard",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "akuakua",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "wooden slit-gong",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ama",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "bell",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ámakáshe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "angel",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ame",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "water",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ameóbe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "ink",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "amereka (agbakara) (ekaikai)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "locally brewed gin, ogogoro",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "amerísaguẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "groundnut oil",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "amiédi (oghwórédi)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "banga soup",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "amióviẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "tears",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "amóno",
+            "POS": "int",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "who (coll.)",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ámrádjẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "charm for protection against the dead",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "amwá",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "cloth",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "án",
+            "POS": "excl",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "exclamation of disbelief, shock or surprise, also used for questioning.",
+            "ILLUSTRATION": "",
+            "UDJE 1": "Án, idie wọ ta na?",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "Án, what are you saying?",
+            "UDJE 2": "Án, a ji mrẹ emu etiẹ ọna?",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": "Án, does one see things such as this?"
+        },
+        {
+            "UBIOTA": "anama",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "pride",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ané",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "April",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "anikú (otéhú)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "lower wrapper (of the two) worn by women",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "áníní",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "old coin, originally a tenth of a penny",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "apene",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "draughts",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aphia",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "knife",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ápiápiá",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "hornbill",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "areba",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "very poisonous seed",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "arere",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "baby louse",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "arhá",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "March",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "arhare (ekorhi)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "forehead",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "arhọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "salvation",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "árhọvwefe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "special bead worn on the neck like a bow-tie by traditional rulers",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "árhóghọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "contribution",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "árhuẹrẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "development",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "áriákpa",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "charm for protection against any poisonous thing taken in by mouth",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "arido",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "charm for sharp remembrance/knowledge",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "árírí",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "fishing net",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aruẹdọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "mercy",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aruẹmrẹ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "prophesy",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aruérivwi",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "designated spot where traditional rites are offered to the ancestors",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "asa1",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "place",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "asá2",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "bird with red beak that bores hole in the pit",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "asadáveravwe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "abattoir",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "asán3",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "June",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "asé1",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "acquittal",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aseje",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "everywhere",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "asén2",
+            "POS": "a",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "odd",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ásiweri",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "mamba",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aso",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "night",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "atámu",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "charm for effective balance",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "atánẹ",
+            "POS": "exp",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "it is said",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "átárhọvwe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "charm for easy acceptance/answer",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "atẹtẹ (akpata)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "tray, flat basin (made locally from a plant called éti)",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "atikprere",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "rumour monger",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ató1",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "chewing stick",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "aton2",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "savanna",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "avá",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "February",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "áviávwe (aviẹn)",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "armpit",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "avwáre1",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "pro we",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "avware3",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "wide area with collection of ponds",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "avwárẹn2",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "pro us",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ávwárhé",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "charm for lightness",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "ávwebọ",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "favourite (e.g. wife)",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "avwerhe",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "sweetness",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        },
+        {
+            "UBIOTA": "avwiana",
+            "POS": "n",
+            "UBIOTA AUDIO": "",
+            "TRANSLATION": "flag",
+            "ILLUSTRATION": "",
+            "UDJE 1": "",
+            "UDJE 1 AUDIO": "",
+            "EXAMPLE 1": "",
+            "UDJE 2": "",
+            "UDJE 2 AUDIO": "",
+            "EXAMPLE 2": ""
+        }
+        ];
+
+        let currentAudio = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dictionary loaded:', dictionaryData.length, 'entries');
+            console.log('Sample entry:', dictionaryData[0]);
+            
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', showSuggestions);
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchWord();
+                }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                const suggestions = document.getElementById('suggestions');
+                if (!suggestions.contains(e.target) && e.target !== searchInput) {
+                    suggestions.style.display = 'none';
+                }
+            });
+        });
+
+        function showSuggestions() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const suggestionsContainer = document.getElementById('suggestions');
+
+            if (!searchTerm) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            const matches = dictionaryData
+                .filter(entry => 
+                    (entry.UBIOTA && entry.UBIOTA.toLowerCase().startsWith(searchTerm)) ||
+                    (entry.TRANSLATION && entry.TRANSLATION.toLowerCase().includes(searchTerm))
+                )
+                .sort((a, b) => {
+                    const aWord = a.UBIOTA.toLowerCase();
+                    const bWord = b.UBIOTA.toLowerCase();
+                    return aWord.localeCompare(bWord);
+                })
+                .slice(0, 5);
+
+            if (matches.length === 0) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            let html = '';
+            matches.forEach(entry => {
+                html += `
+                    <div class="suggestion-item" onclick="selectSuggestion('${entry.UBIOTA}')">
+                        <div class="suggestion-word">${entry.UBIOTA}</div>
+                        <div class="suggestion-translation">${entry.TRANSLATION}</div>
+                    </div>
+                `;
+            });
+
+            suggestionsContainer.innerHTML = html;
+            suggestionsContainer.style.display = 'block';
+        }
+
+        function selectSuggestion(word) {
+            document.getElementById('searchInput').value = word;
+            document.getElementById('suggestions').style.display = 'none';
+            searchWord();
+        }
+
+        function searchWord() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            const resultsSection = document.getElementById('resultsSection');
+            const suggestionsContainer = document.getElementById('suggestions');
+
+            if (!searchTerm) {
+                showNoResults('Please enter a word to search.');
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            // Show loading
+            resultsSection.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Searching...</p>
+                </div>
+            `;
+
+            // Hide suggestions
+            suggestionsContainer.style.display = 'none';
+
+            // Stop any currently playing audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            // Simulate loading delay for better UX
+            setTimeout(() => {
+                const results = dictionaryData.filter(entry => 
+                    (entry.UBIOTA && entry.UBIOTA.toLowerCase() === searchTerm) ||
+                    (entry.TRANSLATION && entry.TRANSLATION.toLowerCase().includes(searchTerm))
+                );
+
+                if (results.length === 0) {
+                    showNoResults(`No results found for "${searchTerm}". Try searching with a different word.`);
+                } else {
+                    displayResults(results);
+                }
+            }, 500);
+        }
+
+        function showNoResults(message) {
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.innerHTML = `
+                <div class="no-results">
+                    <h3>No Results</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function displayResults(results) {
+            const resultsSection = document.getElementById('resultsSection');
+            let html = '';
+
+            results.forEach(entry => {
+                html += createEntryHTML(entry);
+            });
+
+            resultsSection.innerHTML = html;
+        }
+
+        function isValidImageUrl(url) {
+            return url && url !== '-' && url.trim() !== '' && (url.startsWith('http://') || url.startsWith('https://')) && /\.(jpeg|jpg|gif|png|webp)$/i.test(url.split('?')[0]);
+        }
+
+        function createAudioButton(audioUrl, type, buttonText) {
+            if (!audioUrl || audioUrl.trim() === '' || audioUrl === '-') {
+                return `<button class="audio-btn" disabled>🔇 ${buttonText} (N/A)</button>`;
+            }
+            return `<button class="audio-btn" onclick="playAudio('${audioUrl}')">🔊 ${buttonText}</button>`;
+        }
+
+        function createEntryHTML(entry) {
+            let html = `
+                <div class="dictionary-entry">
+                    <div class="word-header">
+                        <div class="urhobo-word">${entry.UBIOTA || ''}</div>
+                        ${entry.POS ? `<span class="pos">${entry.POS}</span>` : ''}
+                    </div>
+                    
+                    <div class="translation">${entry.TRANSLATION || ''}</div>
+                    
+                    <div class="audio-controls">
+                        ${createAudioButton(entry['UBIOTA AUDIO'], 'word', 'Pronounce Word')}
+                    </div>
+            `;
+
+            // Add illustration if available
+            if (isValidImageUrl(entry.ILLUSTRATION)) {
+                html += `
+                    <div class="illustration">
+                        <img src="${entry.ILLUSTRATION}" alt="Illustration for ${entry.UBIOTA}" 
+                             onerror="this.style.display='none'">
+                    </div>
+                `;
+            }
+
+            // Add examples section
+            const hasExamples = (entry['UDJE 1'] && entry['UDJE 1'] !== '-') || 
+                              (entry['UDJE 2'] && entry['UDJE 2'] !== '-');
+            
+            if (hasExamples) {
+                html += '<div class="examples-section"><h4>Examples:</h4>';
+                
+                // Example 1
+                if (entry['UDJE 1'] && entry['UDJE 1'] !== '-') {
+                    html += `
+                        <div class="example">
+                            <div class="example-urhobo">${entry['UDJE 1']}</div>
+                            <div class="example-english">${entry['EXAMPLE 1'] || ''}</div>
+                            <div class="audio-controls" style="margin-top: 10px;">
+                                ${createAudioButton(entry['UDJE 1 AUDIO'], 'example1', 'Play Example 1')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Example 2
+                if (entry['UDJE 2'] && entry['UDJE 2'] !== '-') {
+                    html += `
+                        <div class="example">
+                            <div class="example-urhobo">${entry['UDJE 2']}</div>
+                            <div class="example-english">${entry['EXAMPLE 2'] || ''}</div>
+                            <div class="audio-controls" style="margin-top: 10px;">
+                                ${createAudioButton(entry['UDJE 2 AUDIO'], 'example2', 'Play Example 2')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function playAudio(url) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            currentAudio = new Audio(url);
+            currentAudio.play().catch(e => {
+                console.error("Error playing audio:", e);
+                alert("Sorry, the audio file could not be played. Please check your internet connection.");
+            });
+        }
+
+        function openFeedback() {
+            const email = 'urhoboheritage23@gmail.com';
+            const subject = 'Feedback for Urhobo Dictionary';
+            const body = 'Hello, I would like to provide feedback about the Urhobo Dictionary:\n\n';
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+    </script>
+</body>
+</html>
